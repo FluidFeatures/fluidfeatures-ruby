@@ -1,5 +1,3 @@
 module FluidFeatures
-  module Rails
-    VERSION = '0.2.3'
-  end
+  VERSION = '0.3.0'
 end
