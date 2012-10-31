@@ -1,7 +1,7 @@
-[![Build Status](https://secure.travis-ci.org/FluidFeatures/fluidfeatures-rails.png)](http://travis-ci.org/FluidFeatures/fluidfeatures-rails)
+[![Build Status](https://secure.travis-ci.org/FluidFeatures/fluidfeatures-ruby.png)](http://travis-ci.org/FluidFeatures/fluidfeatures-ruby)
 
-fluidfeatures-rails
+fluidfeatures-ruby
 ===================
 
-Rails client for API of FluidFeatures.com
+Ruby client for API of FluidFeatures.com
 

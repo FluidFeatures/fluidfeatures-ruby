@@ -1,6 +1,10 @@
 
 require "logger"
 
+if RUBY_VERSION < "1.9.2"
+  require "pre_ruby192/uri"
+end
+
 module FluidFeatures
   class Client
 
