@@ -44,6 +44,10 @@ module FluidFeatures
     def user(user_id, display_name, is_anonymous, unique_attrs, cohort_attrs)
       ::FluidFeatures::AppUser.new(self, user_id, display_name, is_anonymous, unique_attrs, cohort_attrs)
     end
+
+    def user_transaction(user_id, url, display_name, is_anonymous, unique_attrs, cohort_attrs)
+      user(user_id, display_name, is_anonymous, unique_attrs, cohort_attrs).transaction(url)
+    end
     
     def feature_version(feature_name, version_name)
       ::FluidFeatures::AppFeatureVersion.new(self, feature_name, version_name)
