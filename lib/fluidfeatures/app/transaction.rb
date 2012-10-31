@@ -4,7 +4,7 @@ require "fluidfeatures/const"
 module FluidFeatures
   class AppUserTransaction
     
-    attr_accessor :user, :url, :features
+    attr_accessor :user, :url, :features, :start_time
     
     def initialize(user, url)
 
@@ -18,6 +18,7 @@ module FluidFeatures
       @features_hit = {}
       @goals_hit = {}
       @unknown_features = {}
+      @start_time = Time.now
 
     end
 
@@ -84,7 +85,10 @@ module FluidFeatures
     # back with the default_enabled status (see unknown_feature_hit)
     # so that FluidFeatures can auto-populate the dashboard.
     #
-    def end_transaction(stats)
+    def end_transaction
+
+      transaction_duration = Time.now - start_time
+      ff_latency = user.app.client.last_fetch_duration
 
       payload = {
         :url => url,
@@ -94,13 +98,15 @@ module FluidFeatures
         :hits => {
           :feature => @features_hit,
           :goal    => @goals_hit
+        },
+        # stats
+        :stats => {
+          :transaction => {
+            :duration => transaction_duration
+          },
+          :ff_latency => ff_latency
         }
       }
-
-      if stats
-        raise "stats invalid : #{stats}" unless stats.is_a? Hash
-        payload[:stats] = stats
-      end
 
       payload_user = payload[:user] ||= {}
       payload_user[:name] = user.display_name if user.display_name
@@ -108,7 +114,6 @@ module FluidFeatures
       payload_user[:unique] = user.unique_attrs if user.unique_attrs
       payload_user[:cohorts] = user.cohort_attrs if user.cohort_attrs
       
-      (payload[:stats] ||= {})[:ff_latency] = user.app.client.last_fetch_duration
       if @unknown_features.size
         (payload[:features] ||= {})[:unknown] = @unknown_features
         @unknown_features = {}
