@@ -28,6 +28,10 @@ module FluidFeatures
 
     end
 
+    def log_request_duration(method, url, duration, status_code, err_msg)
+      @last_fetch_duration = duration
+    end
+
     def get(path, auth_token, url_params=nil)
       payload = nil
 
@@ -40,60 +44,109 @@ module FluidFeatures
         end
       end
 
+      duration = nil
+      status_code = nil
+      err_msg = nil
       begin
+
         request = Net::HTTP::Get.new url_path
         request["Accept"] = "application/json"
         request['AUTHORIZATION'] = auth_token
-        fetch_start_time = Time.now
+
+        request_start_time = Time.now
         response = @http.request request
-        if response.is_a?(Net::HTTPSuccess)
-          payload = JSON.parse(response.body)
-          @last_fetch_duration = Time.now - fetch_start_time
+        duration = Time.now - request_start_time
+
+        if response.is_a? Net::HTTPResponse
+          payload = JSON.load(response.body) rescue nil
+          status_code = response.code
+          unless response.is_a?(Net::HTTPSuccess)
+            if payload and payload.is_a? Hash and payload.has_key? "error"
+              err_msg = payload["error"]
+            end
+            logger.error{"[FF] Request unsuccessful for GET #{path} : #{status_code} #{err_msg}"}
+          end
         end
+      rescue PersistentHTTP::Error => err
+        logger.error{"[FF] Request failed for GET #{path} : #{err.message}"}
       rescue
-        logger.error{"[FF] Request failed when getting #{path}"}
+        logger.error{"[FF] Request failed for GET #{path} : #{status_code} #{err_msg}"}
         raise
+      else
+        if not payload
+          logger.error{"[FF] Empty response for GET #{path} : #{status_code} #{err_msg}"}
+        end
       end
-      if not payload
-        logger.error{"[FF] Empty response from #{path}"}
-      end
+
+      log_request_duration("GET", url_path, duration, status_code, err_msg)
+
       payload
     end
 
     def put(path, auth_token, payload)
+      uri = URI(@base_uri + path)
+      url_path = uri.path
+      duration = nil
+      status_code = nil
+      err_msg = nil
       begin
-        uri = URI(@base_uri + path)
-        request = Net::HTTP::Put.new uri.path
+        request = Net::HTTP::Put.new uri_path
         request["Content-Type"] = "application/json"
         request["Accept"] = "application/json"
         request['AUTHORIZATION'] = auth_token
         request.body = JSON.dump(payload)
         response = @http.request uri, request
+        raise "expected Net::HTTPResponse" if not response.is_a? Net::HTTPResponse
+        status_code = response.code
         unless response.is_a?(Net::HTTPSuccess)
-          logger.error{"[FF] Request unsuccessful when putting #{path}"}
+          response_payload = JSON.load(response.body) rescue nil
+          if response_payload.is_a? Hash and response_payload.has_key? "error"
+            err_msg = response_payload["error"]
+          end
+          logger.error{"[FF] Request unsuccessful for POST #{path} : #{status_code} #{err_msg}"}
         end
+      rescue PersistentHTTP::Error => err
+        logger.error{"[FF] Request failed for PUT #{path} : #{err.message}"}
       rescue Exception => err
-        logger.error{"[FF] Request failed putting #{path} : #{err.message}"}
+        logger.error{"[FF] Request failed for PUT #{path} : #{err.message}"}
         raise
       end
+
+      log_request_duration("PUT", url_path, duration, status_code, err_msg)
+      nil
     end
 
     def post(path, auth_token, payload)
+      uri = URI(@base_uri + path)
+      url_path = uri.path
+      duration = nil
+      status_code = nil
+      err_msg = nil
       begin
-        uri = URI(@base_uri + path)
-        request = Net::HTTP::Post.new uri.path
+        request = Net::HTTP::Post.new url_path
         request["Content-Type"] = "application/json"
         request["Accept"] = "application/json"
         request['AUTHORIZATION'] = auth_token
         request.body = JSON.dump(payload)
         response = @http.request request
+        raise "expected Net::HTTPResponse" if not response.is_a? Net::HTTPResponse
+        status_code = response.code
         unless response.is_a?(Net::HTTPSuccess)
-          logger.error{"[FF] Request unsuccessful when posting #{path}"}
+          response_payload = JSON.load(response.body) rescue nil
+          if response_payload.is_a? Hash and response_payload.has_key? "error"
+            err_msg = response_payload["error"]
+          end
+          logger.error{"[FF] Request unsuccessful for POST #{path} : #{status_code} #{err_msg}"}
         end
+      rescue PersistentHTTP::Error => err
+        logger.error{"[FF] Request failed for POST #{path} : #{err.message}"}
       rescue Exception => err
-        logger.error{"[FF] Request failed posting #{path} : #{err.message}"}
+        logger.error{"[FF] Request failed for POST #{path} : #{err.message}"}
         raise
       end
+
+      log_request_duration("POST", url_path, duration, status_code, err_msg)
+      nil
     end
 
   end
