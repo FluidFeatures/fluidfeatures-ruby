@@ -75,8 +75,24 @@ module FluidFeatures
         end
       end
 
-      get("/features", attribute_ids) || {}
-
+      if true
+        features_enabled = get("/features", attribute_ids) || {}
+      else
+        features_enabled = {}
+        app.state.features.each do |feature_name, feature|
+          feature["versions"].keys.each do |version_name|
+            features_enabled[feature_name] ||= {}
+            features_enabled[feature_name][version_name] = \
+              app.state.feature_version_enabled_for_user(
+                feature_name,
+                version_name,
+                unique_id,
+                attribute_ids
+              )
+          end
+        end
+      end
+      features_enabled
     end
 
     def transaction(url)
