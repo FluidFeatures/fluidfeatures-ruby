@@ -75,7 +75,7 @@ module FluidFeatures
         end
       end
 
-      if true
+      if ENV["FLUIDFEATURES_USER_FEATURES_FROM_API"]
         features_enabled = get("/features", attribute_ids) || {}
       else
         features_enabled = {}

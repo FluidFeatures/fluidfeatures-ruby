@@ -1,6 +1,7 @@
 
 require "digest/sha1"
 require "set"
+require "thread"
 
 require "fluidfeatures/const"
 require "fluidfeatures/app/transaction"
@@ -8,28 +9,85 @@ require "fluidfeatures/app/transaction"
 module FluidFeatures
   class AppState
     
-    attr_accessor :app, :features
+    attr_accessor :app
     USER_ID_NUMERIC = Regexp.compile("^\d+$")
     
+    # Request to FluidFeatures API to long-poll for max
+    # 30 seconds. The API may choose a different duration.
+    # If not change in this time, API will return HTTP 304.
+    ETAG_WAIT = 30
+    ETAG_WAIT = 5 if ENV["FF_DEV"]
+
     def initialize(app)
 
       raise "app invalid : #{app}" unless app.is_a? FluidFeatures::App
 
       @app = app
+      @features = {}
+      @features_lock = ::Mutex.new
 
-      load_state
+      run_state_fetcher
 
     end
 
-    def load_state
-      result = app.get("/features", { :verbose => true })
-      result.each do |feature_name, feature|
-        feature["versions"].each do |version_name, version|
-          # convert parts to a Set for quick lookup
-          version["parts"] = Set.new(version["parts"] || [])
+    def features
+      f = nil
+      @features_lock.synchronize do
+        f = @features
+      end
+      f
+    end
+
+    def features= f
+      return unless f.is_a? Hash
+      @features_lock.synchronize do
+        @features = f
+      end
+    end
+
+    def run_state_fetcher
+      Thread.new do
+        while true
+          begin
+
+            success, state = load_state
+
+            # Note, success could be true, but state might be nil.
+            # This occurs with 304 (no change)
+            if success and state
+              # switch out current state with new one
+              self.features = state
+            elsif not success
+              # If service is down, then slow our requests
+              # within this thread
+              sleep 3
+            end
+
+            # What ever happens never make more than 2 requests
+            # per second encase something goes wrong.
+            sleep 0.5
+
+          rescue Exception => err
+            # catch errors, so that we do not affect the rest of the application
+            app.logger.error "load_state failed : #{err.message}\n#{err.backtrace.join("\n")}"
+            # hold off for a little while and try again
+            sleep 5
+          end
         end
       end
-      @features = result
+    end
+
+    def load_state
+      success, state = app.get("/features", { :verbose => true, :etag_wait => ETAG_WAIT }, true)
+      if success and state
+        state.each do |feature_name, feature|
+          feature["versions"].each do |version_name, version|
+            # convert parts to a Set for quick lookup
+            version["parts"] = Set.new(version["parts"] || [])
+          end
+        end
+      end
+      return success, state
     end
 
     def feature_version_enabled_for_user(feature_name, version_name, user_id, user_attributes={})
@@ -40,7 +98,7 @@ module FluidFeatures
       #assert(isinstance(user_id, basestring))
       
       user_attributes ||= {}
-      user_attributes["user"] = user_id
+      user_attributes["user"] = user_id.to_s
       if user_id.is_a? Integer
         user_id_hash = user_id
       elsif USER_ID_NUMERIC.match(user_id)
@@ -61,8 +119,8 @@ module FluidFeatures
           version_attributes = (other_version["enabled"] || {})["attributes"]
           if version_attributes
             user_attributes.each do |attr_key, attr_id|
-              version_attribute = version_attributes[attr_key]
-              if version_attribute and version_attribute.include? attr_id
+              version_attribute = version_attributes[attr_key.to_s]
+              if version_attribute and version_attribute.include? attr_id.to_s
                 if other_version_name == version_name
                   # explicitly enabled for this version
                   return true

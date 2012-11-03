@@ -22,8 +22,8 @@ module FluidFeatures
 
     end
 
-    def get(path, params=nil)
-      client.get("/app/#{app_id}#{path}", secret, params)
+    def get(path, params=nil, cache=false)
+      client.get("/app/#{app_id}#{path}", secret, params, cache)
     end
 
     def put(path, payload)
