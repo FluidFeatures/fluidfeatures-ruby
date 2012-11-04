@@ -83,8 +83,10 @@ module FluidFeatures
       begin
 
         request = Net::HTTP::Get.new url_path
+        request["Authorization"] = auth_token
         request["Accept"] = "application/json"
-        request['AUTHORIZATION'] = auth_token
+        request["Accept-Encoding"] = "gzip"
+
         @etags_lock.synchronize do
           if cache and @etags.has_key? url_path
             request["If-None-Match"] = @etags[url_path][:etag]
@@ -101,7 +103,7 @@ module FluidFeatures
             no_change = true
             success = true
           elsif response.is_a? Net::HTTPSuccess
-            payload = JSON.load(response.body) rescue nil
+            payload = parse_response_body response
             if cache
               @etags_lock.synchronize do
                 @etags[url_path] = {
@@ -112,7 +114,7 @@ module FluidFeatures
             end
             success = true
           else
-            payload = JSON.load(response.body) rescue nil
+            payload = parse_response_body response
             if payload and payload.is_a? Hash and payload.has_key? "error"
               err_msg = payload["error"]
             end
@@ -143,11 +145,12 @@ module FluidFeatures
       err_msg = nil
       success = false
       begin
+
         request = Net::HTTP::Put.new uri_path
-        request["Content-Type"] = "application/json"
+        request["Authorization"] = auth_token
         request["Accept"] = "application/json"
-        request['AUTHORIZATION'] = auth_token
-        request.body = JSON.dump(payload)
+        request["Accept-Encoding"] = "gzip"
+        encode_request_body(request, payload)
 
         request_start_time = Time.now
         response = @http.request uri, request
@@ -158,7 +161,7 @@ module FluidFeatures
         if response.is_a? Net::HTTPSuccess
           success = true
         else
-          response_payload = JSON.load(response.body) rescue nil
+          response_payload = parse_response_body response
           if response_payload.is_a? Hash and response_payload.has_key? "error"
             err_msg = response_payload["error"]
           end
@@ -183,11 +186,12 @@ module FluidFeatures
       err_msg = nil
       success = false
       begin
+
         request = Net::HTTP::Post.new url_path
-        request["Content-Type"] = "application/json"
         request["Accept"] = "application/json"
-        request['AUTHORIZATION'] = auth_token
-        request.body = JSON.dump(payload)
+        request["Accept-Encoding"] = "gzip"
+        request["Authorization"] = auth_token
+        encode_request_body(request, payload)
 
         request_start_time = Time.now
         response = @http.request request
@@ -198,7 +202,7 @@ module FluidFeatures
         if response.is_a? Net::HTTPSuccess
           success = true
         else
-          response_payload = JSON.load(response.body) rescue nil
+          response_payload = parse_response_body response
           if response_payload.is_a? Hash and response_payload.has_key? "error"
             err_msg = response_payload["error"]
           end
@@ -213,6 +217,36 @@ module FluidFeatures
 
       log_api_request("POST", url_path, duration, status_code, err_msg)
       return success
+    end
+
+    def parse_response_body response
+      content = response.body
+      if response["Content-Encoding"] == "gzip"
+        content = Zlib::GzipReader.new(
+          StringIO.new(content)
+        ).read
+      end
+      JSON.load(content) rescue nil
+    end
+
+    def encode_request_body(request, payload, encoding="gzip")
+
+      # Encode as JSON string
+      content = JSON.dump(payload)
+
+      # Gzip compress if necessary
+      if encoding == "gzip"
+        compressed = StringIO.new
+        gz_writer = Zlib::GzipWriter.new(compressed)
+        gz_writer.write(content)
+        gz_writer.close
+        content = compressed.string
+      end
+
+      request["Content-Type"] = "application/json"
+      request["Content-Encoding"] = encoding
+      request.body = content
+
     end
 
   end
