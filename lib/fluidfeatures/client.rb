@@ -14,6 +14,9 @@ module FluidFeatures
 
     API_REQUEST_LOG_MAX_SIZE = 200
 
+    # Do not gzip request or response body if size is under N bytes
+    MIN_GZIP_SIZE = 1024
+
     def initialize(base_uri, logger)
 
       @uuid = UUID.new.generate
@@ -235,7 +238,7 @@ module FluidFeatures
       content = JSON.dump(payload)
 
       # Gzip compress if necessary
-      if encoding == "gzip"
+      if encoding == "gzip" and content.size >= MIN_GZIP_SIZE
         compressed = StringIO.new
         gz_writer = Zlib::GzipWriter.new(compressed)
         gz_writer.write(content)
