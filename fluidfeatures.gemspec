@@ -14,4 +14,5 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.require_paths = ["lib"]
   s.add_dependency "persistent_http", "~>1.0.3"
+  s.add_dependency "uuid", "~>2.3.5"
 end

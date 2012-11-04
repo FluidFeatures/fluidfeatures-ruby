@@ -15,8 +15,17 @@ module FluidFeatures
     # Request to FluidFeatures API to long-poll for max
     # 30 seconds. The API may choose a different duration.
     # If not change in this time, API will return HTTP 304.
-    ETAG_WAIT = 30
-    ETAG_WAIT = 5 if ENV["FF_DEV"]
+    ETAG_WAIT = ENV["FF_DEV"] ? 5 : 30
+
+    # Hard max of 2 req/sec
+    WAIT_BETWEEN_FETCH_SUCCESS = 0.5 # seconds
+
+    # Hard max of 10 req/sec
+    WAIT_BETWEEN_SEND_SUCCESS_NEXT_WAITING = 0.1 # seconds
+
+    # If we are failing to communicate with the FluidFeautres API
+    # then wait for this long between requests.
+    WAIT_BETWEEN_FETCH_FAILURES = 5 # seconds
 
     def initialize(app)
 
@@ -60,18 +69,18 @@ module FluidFeatures
             elsif not success
               # If service is down, then slow our requests
               # within this thread
-              sleep 3
+              sleep WAIT_BETWEEN_FETCH_FAILURES
             end
 
-            # What ever happens never make more than 2 requests
-            # per second encase something goes wrong.
-            sleep 0.5
+            # What ever happens never make more than N requests
+            # per second
+            sleep WAIT_BETWEEN_FETCH_SUCCESS
 
           rescue Exception => err
             # catch errors, so that we do not affect the rest of the application
             app.logger.error "load_state failed : #{err.message}\n#{err.backtrace.join("\n")}"
             # hold off for a little while and try again
-            sleep 5
+            sleep WAIT_BETWEEN_FETCH_FAILURES
           end
         end
       end
@@ -80,8 +89,8 @@ module FluidFeatures
     def load_state
       success, state = app.get("/features", { :verbose => true, :etag_wait => ETAG_WAIT }, true)
       if success and state
-        state.each do |feature_name, feature|
-          feature["versions"].each do |version_name, version|
+        state.each_pair do |feature_name, feature|
+          feature["versions"].each_pair do |version_name, version|
             # convert parts to a Set for quick lookup
             version["parts"] = Set.new(version["parts"] || [])
           end
@@ -114,11 +123,11 @@ module FluidFeatures
       enabled = version["parts"].include? modulus
 
       # check attributes
-      feature["versions"].each do |other_version_name, other_version|
+      feature["versions"].each_pair do |other_version_name, other_version|
         if other_version
           version_attributes = (other_version["enabled"] || {})["attributes"]
           if version_attributes
-            user_attributes.each do |attr_key, attr_id|
+            user_attributes.each_pair do |attr_key, attr_id|
               version_attribute = version_attributes[attr_key.to_s]
               if version_attribute and version_attribute.include? attr_id.to_s
                 if other_version_name == version_name

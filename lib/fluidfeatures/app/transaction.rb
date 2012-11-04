@@ -4,8 +4,8 @@ require "fluidfeatures/const"
 module FluidFeatures
   class AppUserTransaction
     
-    attr_accessor :user, :url, :features, :start_time
-    
+    attr_accessor :user, :url, :features, :start_time, :ended, :features_hit, :goals_hit, :unknown_features
+
     def initialize(user, url)
 
       @user = user
@@ -19,11 +19,12 @@ module FluidFeatures
       @goals_hit = {}
       @unknown_features = {}
       @start_time = Time.now
+      @ended = false
 
     end
 
     def feature_enabled?(feature_name, version_name, default_enabled)
-
+      raise "transaction ended" if ended
       raise "feature_name invalid : #{feature_name}" unless feature_name.is_a? String
       version_name ||= ::FluidFeatures::DEFAULT_VERSION_NAME
 
@@ -63,18 +64,30 @@ module FluidFeatures
     # intend to phase in.
     #
     def unknown_feature_hit(feature_name, version_name, default_enabled)
-      if not @unknown_features[feature_name]
-        @unknown_features[feature_name] = { :versions => {} }
+      raise "transaction ended" if ended
+      unless @unknown_features.has_key? feature_name
+        @unknown_features[feature_name] = {}
       end
-      @unknown_features[feature_name][:versions][version_name] = default_enabled
+      unless @unknown_features[feature_name].has_key? version_name
+        @unknown_features[feature_name][version_name] = default_enabled
+      end
     end
 
     def goal_hit(goal_name, goal_version_name)
+      raise "transaction ended" if ended
       raise "goal_name invalid : #{goal_name}" unless goal_name.is_a? String
       goal_version_name ||= ::FluidFeatures::DEFAULT_VERSION_NAME
       raise "goal_version_name invalid : #{goal_version_name}" unless goal_version_name.is_a? String
       @goals_hit[goal_name.to_s] ||= {}
       @goals_hit[goal_name.to_s][goal_version_name.to_s] = {}
+    end
+
+    def duration
+      if ended
+        @duration
+      else
+        Time.now - start_time
+      end
     end
 
     #
@@ -87,40 +100,10 @@ module FluidFeatures
     #
     def end_transaction
 
-      transaction_duration = Time.now - start_time
-      ff_latency = user.app.client.last_fetch_duration
-
-      payload = {
-        :url => url,
-        :user => {
-          :id => user.unique_id
-        },
-        :hits => {
-          :feature => @features_hit,
-          :goal    => @goals_hit
-        },
-        # stats
-        :stats => {
-          :transaction => {
-            :duration => transaction_duration
-          },
-          :ff_latency => ff_latency
-        }
-      }
-
-      payload_user = payload[:user] ||= {}
-      payload_user[:name] = user.display_name if user.display_name
-      payload_user[:anonymous] = user.anonymous if user.anonymous
-      payload_user[:unique] = user.unique_attrs if user.unique_attrs
-      payload_user[:cohorts] = user.cohort_attrs if user.cohort_attrs
-      
-      if @unknown_features.size
-        (payload[:features] ||= {})[:unknown] = @unknown_features
-        @unknown_features = {}
-      end
-      
-      user.post("/transaction", payload)
-
+      raise "transaction already ended" if ended
+      @ended = true
+      @duration = Time.now - start_time
+      user.app.reporter.report_transaction(self)
     end
 
   end

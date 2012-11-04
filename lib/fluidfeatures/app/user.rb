@@ -9,7 +9,7 @@ module FluidFeatures
     
     def initialize(app, user_id, display_name, is_anonymous, unique_attrs, cohort_attrs)
 
-      raise "app invalid : #{app}" unless app.is_a? FluidFeatures::App
+      raise "app invalid : #{app}" unless app.is_a? ::FluidFeatures::App
 
       @app = app
       @unique_id = user_id

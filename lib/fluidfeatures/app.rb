@@ -2,11 +2,12 @@
 require "fluidfeatures/app/user"
 require "fluidfeatures/app/feature"
 require "fluidfeatures/app/state"
+require "fluidfeatures/app/reporter"
 
 module FluidFeatures
   class App
     
-    attr_accessor :client, :app_id, :secret, :state, :logger
+    attr_accessor :client, :app_id, :secret, :state, :reporter, :logger
     
     def initialize(client, app_id, secret, logger)
 
@@ -19,6 +20,7 @@ module FluidFeatures
       @secret = secret
       @logger = logger
       @state = ::FluidFeatures::AppState.new(self)
+      @reporter = ::FluidFeatures::AppReporter.new(self)
 
     end
 

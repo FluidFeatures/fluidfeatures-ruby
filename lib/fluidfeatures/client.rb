@@ -3,16 +3,20 @@ require "net/http"
 require "persistent_http"
 require "pre_ruby192/uri" if RUBY_VERSION < "1.9.2"
 require "thread"
+require "uuid"
 
 require "fluidfeatures/app"
 
 module FluidFeatures
   class Client
 
-    attr_accessor :base_uri, :logger, :last_fetch_duration
+    attr_accessor :uuid, :base_uri, :logger, :last_fetch_duration
+
+    API_REQUEST_LOG_MAX_SIZE = 200
 
     def initialize(base_uri, logger)
 
+      @uuid = UUID.new.generate
       @logger = logger
       @base_uri = base_uri
 
@@ -25,14 +29,38 @@ module FluidFeatures
         :url          => base_uri
       )
 
-      @last_fetch_duration = nil
+      @api_request_log = []
+      @api_request_log_lock = ::Mutex.new
+
       @etags = {}
       @etags_lock = ::Mutex.new
 
     end
 
-    def log_request_duration(method, url, duration, status_code, err_msg)
-      @last_fetch_duration = duration
+    def log_api_request(method, url, duration, status_code, err_msg)
+      @api_request_log_lock.synchronize do
+        @api_request_log << {
+          :method => method,
+          :url => url,
+          :duration => duration,
+          :status => status_code,
+          :err => err_msg,
+          :time => Time.now.to_f.round(2)
+        }
+        # remove older entry if too big
+        if @api_request_log.size > API_REQUEST_LOG_MAX_SIZE
+          @api_request_log.shift
+        end
+      end
+    end
+
+    def siphon_api_request_log
+      request_log = nil
+      @api_request_log_lock.synchronize do
+        request_log = @api_request_log
+        @api_request_log = []
+      end
+      request_log
     end
 
     def get(path, auth_token, url_params=nil, cache=false)
@@ -102,7 +130,7 @@ module FluidFeatures
         end
       end
 
-      log_request_duration("GET", url_path, duration, status_code, err_msg)
+      log_api_request("GET", url_path, duration, status_code, err_msg)
 
       return success, payload
     end
@@ -120,7 +148,11 @@ module FluidFeatures
         request["Accept"] = "application/json"
         request['AUTHORIZATION'] = auth_token
         request.body = JSON.dump(payload)
+
+        request_start_time = Time.now
         response = @http.request uri, request
+        duration = Time.now - request_start_time
+
         raise "expected Net::HTTPResponse" if not response.is_a? Net::HTTPResponse
         status_code = response.code
         if response.is_a? Net::HTTPSuccess
@@ -139,7 +171,7 @@ module FluidFeatures
         raise
       end
 
-      log_request_duration("PUT", url_path, duration, status_code, err_msg)
+      log_api_request("PUT", url_path, duration, status_code, err_msg)
       return success
     end
 
@@ -156,7 +188,11 @@ module FluidFeatures
         request["Accept"] = "application/json"
         request['AUTHORIZATION'] = auth_token
         request.body = JSON.dump(payload)
+
+        request_start_time = Time.now
         response = @http.request request
+        duration = Time.now - request_start_time
+
         raise "expected Net::HTTPResponse" if not response.is_a? Net::HTTPResponse
         status_code = response.code
         if response.is_a? Net::HTTPSuccess
@@ -175,7 +211,7 @@ module FluidFeatures
         raise
       end
 
-      log_request_duration("POST", url_path, duration, status_code, err_msg)
+      log_api_request("POST", url_path, duration, status_code, err_msg)
       return success
     end
 
