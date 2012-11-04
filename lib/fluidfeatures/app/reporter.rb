@@ -138,8 +138,6 @@ module FluidFeatures
     def send_transcations
       bucket = remove_bucket
       
-      ff_latency = app.client.last_fetch_duration
-
       # Take existing unknown features and reset
       unknown_features = nil
       @unknown_features_lock.synchronize do
@@ -158,7 +156,6 @@ module FluidFeatures
         :client_uuid => app.client.uuid,
         :transactions => bucket,
         :stats => {
-          :ff_latency => ff_latency,
           :waiting_buckets => remaining_buckets_stats
         },
         :unknown_features => unknown_features,

@@ -10,7 +10,7 @@ require "fluidfeatures/app"
 module FluidFeatures
   class Client
 
-    attr_accessor :uuid, :base_uri, :logger, :last_fetch_duration
+    attr_accessor :uuid, :base_uri, :logger
 
     API_REQUEST_LOG_MAX_SIZE = 200
 
