@@ -244,10 +244,10 @@ module FluidFeatures
         gz_writer.write(content)
         gz_writer.close
         content = compressed.string
+        request["Content-Encoding"] = encoding
       end
 
       request["Content-Type"] = "application/json"
-      request["Content-Encoding"] = encoding
       request.body = content
 
     end
