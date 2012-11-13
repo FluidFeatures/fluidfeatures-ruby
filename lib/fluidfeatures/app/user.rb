@@ -76,7 +76,7 @@ module FluidFeatures
       end
 
       if ENV["FLUIDFEATURES_USER_FEATURES_FROM_API"]
-        features_enabled = get("/features", attribute_ids) || {}
+        success, features_enabled = get("/features", attribute_ids) || {}
       else
         features_enabled = {}
         app.state.features.each do |feature_name, feature|
