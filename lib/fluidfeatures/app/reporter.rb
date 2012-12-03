@@ -46,8 +46,8 @@ module FluidFeatures
 
     end
 
-    # Pass FluidFeatures::AppTransaction for reporting back to the
-    # FluidFeatures service.
+    # Pass FluidFeatures::AppUserTransaction for reporting
+    # back to the FluidFeatures service.
     def report_transaction(transaction)
 
       user = transaction.user
