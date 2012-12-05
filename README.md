@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/liquidautumn/fluidfeatures-ruby.png)](http://travis-ci.org/liquidautumn/fluidfeatures-ruby)
+[![Build Status](https://secure.travis-ci.org/FluidFeatures/fluidfeatures-ruby.png)](http://travis-ci.org/FluidFeatures/fluidfeatures-ruby)
 
 fluidfeatures-ruby
 ===================
