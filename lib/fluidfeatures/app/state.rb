@@ -1,4 +1,3 @@
-
 require "digest/sha1"
 require "set"
 require "thread"
@@ -8,10 +7,11 @@ require "fluidfeatures/app/transaction"
 
 module FluidFeatures
   class AppState
-    
+
     attr_accessor :app
-    USER_ID_NUMERIC = Regexp.compile("^\d+$")
-    
+
+    USER_ID_NUMERIC = /^\d+$/
+
     # Request to FluidFeatures API to long-poll for max
     # 30 seconds. The API may choose a different duration.
     # If not change in this time, API will return HTTP 304.
@@ -28,15 +28,15 @@ module FluidFeatures
     WAIT_BETWEEN_FETCH_FAILURES = 5 # seconds
 
     def initialize(app)
+      raise "app invalid : #{app}" unless app.is_a? ::FluidFeatures::App
+      configure(app)
+      run_loop
+    end
 
-      raise "app invalid : #{app}" unless app.is_a? FluidFeatures::App
-
+    def configure(app)
       @app = app
       @features = {}
       @features_lock = ::Mutex.new
-
-      run_state_fetcher
-
     end
 
     def features
@@ -54,7 +54,7 @@ module FluidFeatures
       end
     end
 
-    def run_state_fetcher
+    def run_loop
       Thread.new do
         while true
           begin
@@ -105,7 +105,7 @@ module FluidFeatures
       raise "version_name invalid : #{version_name}" unless version_name.is_a? String
 
       #assert(isinstance(user_id, basestring))
-      
+
       user_attributes ||= {}
       user_attributes["user"] = user_id.to_s
       if user_id.is_a? Integer
@@ -122,7 +122,6 @@ module FluidFeatures
       modulus = user_id_hash % feature["num_parts"]
       enabled = version["parts"].include? modulus
 
-      # check attributes
       feature["versions"].each_pair do |other_version_name, other_version|
         if other_version
           version_attributes = (other_version["enabled"] || {})["attributes"]

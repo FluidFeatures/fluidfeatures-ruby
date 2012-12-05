@@ -1,0 +1,441 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.fluidfeatures.com/service/app/1vu33ki6emqe3/features?verbose=true&etag_wait=30
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      accept:
+      - application/json
+      user-agent:
+      - Ruby
+      accept-encoding:
+      - gzip
+      if-none-match:
+      - ! '"36679fb05ecafe685b0dc553390ccb1df563da75"'
+      connection:
+      - keep-alive
+      keep-alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: !binary |-
+        T0s=
+    headers:
+      !binary "Y2FjaGUtY29udHJvbA==":
+      - !binary |-
+        bm8tY2FjaGU=
+      !binary "Y29udGVudC1lbmNvZGluZw==":
+      - !binary |-
+        Z3ppcA==
+      !binary "Y29udGVudC10eXBl":
+      - !binary |-
+        dGV4dC9odG1sOyBjaGFyc2V0PVVURi04
+      !binary "ZGF0ZQ==":
+      - !binary |-
+        TW9uLCAwMyBEZWMgMjAxMiAwODoyMjo0MiBHTVQ=
+      !binary "ZXRhZw==":
+      - !binary |-
+        IjY2MTNmMjJjNWJkNDdlYWQ2MjY2Mzg2MTA3MmM0MzI4OWJlNWU0ZmIi
+      !binary "ZXhwaXJlcw==":
+      - !binary |-
+        TW9uLCAwMyBEZWMgMjAxMiAwODoyMjo0MSBHTVQ=
+      !binary "c2VydmVy":
+      - !binary |-
+        VG9ybmFkb1NlcnZlci8yLjM=
+      !binary "Y29udGVudC1sZW5ndGg=":
+      - !binary |-
+        NTE3
+      !binary "Y29ubmVjdGlvbg==":
+      - !binary |-
+        a2VlcC1hbGl2ZQ==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAAA62TTW7CQAyFrxJlnQUzmd8eoJeoUBVoqJBKiiCwiXL3fjYw
+        lVAXSHQxJX7z7LFfn6f6te/G06GvX6qpHrqdfBSsqerhtHvfd4fxCG4WC5Bz
+        fzhuvwcBprrTv8exU8JUn47d56XWvj+s+2Hk3vp5Ju9W5c00VWiq1FS5oSTH
+        cwgNseXSthwwC8uCtXBa8Ba8dZzIAXfgDtwRO/K95cDx5HmJ4QSwQK1AHOFH
+        +JEaESySF+Ek8AQvkZvgJbAMluFm8AyeycnkZHJyXjJOP3Srr/5D5/+dFYlm
+        udxs+vW4Pd9L4RcqxeoB1a7UohqN0AdtSOeIRXMGzAAaUMPQBtzSuAW3YFZi
+        Bmoll7QWTkvsiJ0Ug+PAHbhjaE+up66XV8A9+QEsgAX4ATzADYLDj9SJ4BEs
+        UjfBS3ASuQkswcv8Zu4QZvmMaqrb1atG5bszq6kp/w9uvfyHiuwiE0owMDMy
+        kkzCYVJVHUjtCqdYFo7aFo5albjYVZSnmCoOrqrDK9aVt3hJlC8W5j1RXZXm
+        Xq0rMfnFvqI8mCrOt1qWd3J4SnQUfcSqfyw4c2Yk4kcNSitqUFrWLWck3XTu
+        xaS64XyXDYcvZtXtvhlVJCFPjKmGhF9MKRj3suVqTHi66XBky8t2I5+aE17Z
+        cji63fDEqFn6ftqs8w8QikWdWQUAAA==
+    http_version: !binary |-
+      MS4x
+  recorded_at: Mon, 03 Dec 2012 08:22:42 GMT
+- request:
+    method: get
+    uri: https://www.fluidfeatures.com/service/app/1vu33ki6emqe3/features?verbose=true&etag_wait=30
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      accept:
+      - application/json
+      user-agent:
+      - Ruby
+      accept-encoding:
+      - gzip
+      connection:
+      - keep-alive
+      keep-alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: !binary |-
+        T0s=
+    headers:
+      !binary "Y2FjaGUtY29udHJvbA==":
+      - !binary |-
+        bm8tY2FjaGU=
+      !binary "Y29udGVudC1lbmNvZGluZw==":
+      - !binary |-
+        Z3ppcA==
+      !binary "Y29udGVudC10eXBl":
+      - !binary |-
+        dGV4dC9odG1sOyBjaGFyc2V0PVVURi04
+      !binary "ZGF0ZQ==":
+      - !binary |-
+        TW9uLCAwMyBEZWMgMjAxMiAwODoyMjo0MyBHTVQ=
+      !binary "ZXRhZw==":
+      - !binary |-
+        IjY2MTNmMjJjNWJkNDdlYWQ2MjY2Mzg2MTA3MmM0MzI4OWJlNWU0ZmIi
+      !binary "ZXhwaXJlcw==":
+      - !binary |-
+        TW9uLCAwMyBEZWMgMjAxMiAwODoyMjo0MiBHTVQ=
+      !binary "c2VydmVy":
+      - !binary |-
+        VG9ybmFkb1NlcnZlci8yLjM=
+      !binary "Y29udGVudC1sZW5ndGg=":
+      - !binary |-
+        NTE3
+      !binary "Y29ubmVjdGlvbg==":
+      - !binary |-
+        a2VlcC1hbGl2ZQ==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAAA62TTW7CQAyFrxJlnQUzmd8eoJeoUBVoqJBKiiCwiXL3fjYw
+        lVAXSHQxJX7z7LFfn6f6te/G06GvX6qpHrqdfBSsqerhtHvfd4fxCG4WC5Bz
+        fzhuvwcBprrTv8exU8JUn47d56XWvj+s+2Hk3vp5Ju9W5c00VWiq1FS5oSTH
+        cwgNseXSthwwC8uCtXBa8Ba8dZzIAXfgDtwRO/K95cDx5HmJ4QSwQK1AHOFH
+        +JEaESySF+Ek8AQvkZvgJbAMluFm8AyeycnkZHJyXjJOP3Srr/5D5/+dFYlm
+        udxs+vW4Pd9L4RcqxeoB1a7UohqN0AdtSOeIRXMGzAAaUMPQBtzSuAW3YFZi
+        Bmoll7QWTkvsiJ0Ug+PAHbhjaE+up66XV8A9+QEsgAX4ATzADYLDj9SJ4BEs
+        UjfBS3ASuQkswcv8Zu4QZvmMaqrb1atG5bszq6kp/w9uvfyHiuwiE0owMDMy
+        kkzCYVJVHUjtCqdYFo7aFo5albjYVZSnmCoOrqrDK9aVt3hJlC8W5j1RXZXm
+        Xq0rMfnFvqI8mCrOt1qWd3J4SnQUfcSqfyw4c2Yk4kcNSitqUFrWLWck3XTu
+        xaS64XyXDYcvZtXtvhlVJCFPjKmGhF9MKRj3suVqTHi66XBky8t2I5+aE17Z
+        cji63fDEqFn6ftqs8w8QikWdWQUAAA==
+    http_version: !binary |-
+      MS4x
+  recorded_at: Mon, 03 Dec 2012 08:22:42 GMT
+- request:
+    method: post
+    uri: https://www.fluidfeatures.com/service/app/1vu33ki6emqe3/report/transactions
+    body:
+      encoding: UTF-8
+      string: ! '{"client_uuid":"8801b4e0-1f50-0130-eb8a-704da2623409","transactions":[{"url":"http://example.com","user":{"id":"anon-7468504183-177986","anonymous":true,"unique":[],"cohorts":[]},"hits":{"feature":{"Feature1":{"a":{}}},"goal":{"Goal":{"a":{}}}},"stats":{"duration":5.0021e-05}}],"stats":{"waiting_buckets":[0]},"unknown_features":{"Feature1":{"a":true}},"api_request_log":[]}'
+    headers:
+      accept:
+      - application/json
+      user-agent:
+      - Ruby
+      accept-encoding:
+      - gzip
+      content-type:
+      - application/json
+      connection:
+      - keep-alive
+      keep-alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      cache-control:
+      - no-cache
+      content-type:
+      - text/html; charset=UTF-8
+      date:
+      - Mon, 03 Dec 2012 08:22:43 GMT
+      expires:
+      - Mon, 03 Dec 2012 08:22:42 GMT
+      server:
+      - TornadoServer/2.3
+      content-length:
+      - '0'
+      connection:
+      - keep-alive
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: '1.1'
+  recorded_at: Mon, 03 Dec 2012 08:22:43 GMT
+- request:
+    method: get
+    uri: https://www.fluidfeatures.com/service/app/1vu33ki6emqe3/features?verbose=true&etag_wait=30
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      accept:
+      - application/json
+      user-agent:
+      - Ruby
+      authorization:
+      - lnUG0NAuKXwRxzlO0Ogwh3JLRBr3Fq8SBxcNHUJo
+      accept-encoding:
+      - gzip
+      if-none-match:
+      - !binary |-
+        IjY2MTNmMjJjNWJkNDdlYWQ2MjY2Mzg2MTA3MmM0MzI4OWJlNWU0ZmIi
+      connection:
+      - keep-alive
+      keep-alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: !binary |-
+        T0s=
+    headers:
+      !binary "Y2FjaGUtY29udHJvbA==":
+      - !binary |-
+        bm8tY2FjaGU=
+      !binary "Y29udGVudC1lbmNvZGluZw==":
+      - !binary |-
+        Z3ppcA==
+      !binary "Y29udGVudC10eXBl":
+      - !binary |-
+        dGV4dC9odG1sOyBjaGFyc2V0PVVURi04
+      !binary "ZGF0ZQ==":
+      - !binary |-
+        TW9uLCAwMyBEZWMgMjAxMiAwODoyMjo0MyBHTVQ=
+      !binary "ZXRhZw==":
+      - !binary |-
+        ImM3MmNjZDI2YzEzNDc2ZDMyNGQ4ZjAwMWJmNjRlYWI2NDA1MDM3OTgi
+      !binary "ZXhwaXJlcw==":
+      - !binary |-
+        TW9uLCAwMyBEZWMgMjAxMiAwODoyMjo0MiBHTVQ=
+      !binary "c2VydmVy":
+      - !binary |-
+        VG9ybmFkb1NlcnZlci8yLjM=
+      !binary "Y29udGVudC1sZW5ndGg=":
+      - !binary |-
+        NTEy
+      !binary "Y29ubmVjdGlvbg==":
+      - !binary |-
+        a2VlcC1hbGl2ZQ==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAAA7WTTW7CQAyFrxJlnQUzmd8eoJeoUBVoqJBKWiWBTcTd+9mU
+        qYS6QEJdDMRvnj320/NSP/fdfBz7+qla6qE7yEfBmqoejofXr26cJ3CzWoGc
+        +nHafw4CLHWnv9PcKWGpj1P3fqn11Y/bfpi5t6vzmbxrlRfTVKGpUlPlhpIc
+        zyE0xJZL23LALCwL1sJpwVvw1nEiB9yBO3BH7Mj3lgPHk+clhhPAArUCcYQf
+        4UdqRLBIXoSTwBO8RG6Cl8AyWIabwTN4JieTk8nJec04/dBtPvo3nf93ViQ6
+        y+Vu12/n/elWCn+RYnOHau5GNRqhD9qQzhGL5gyYATSghqENuKVxC27BrMQM
+        1EouaS2cltgROykGx4E7cMfQnlxPXS+vgHvyA1gAC/ADeIAbBIcfqRPBI1ik
+        boKX4CRyE1iCl/nP3CHM+hHV1EI/XjUq341ZTU35f3Cr6IQUTMyQzCSjcBhV
+        ZQdSv8IpnoWjvoWjXiUufhXpKaaSg6vs8Ip35S1eEumLh3lPZFepuVfvSkx+
+        8a9ID6aS862e5Z0cHlIdSe/x6h8bzpwZifhTh9KKOpSWdc0ZSVede3Gprjjf
+        ZcXhi1t1va9OFUnIE2eqI+EXVwrGvay5OhOerjocWfOy3sin7oRX1hyOrjc8
+        cWqWvh926/kbJ9GBE1oFAAA=
+    http_version: !binary |-
+      MS4x
+  recorded_at: Mon, 03 Dec 2012 08:22:43 GMT
+- request:
+    method: get
+    uri: https://www.fluidfeatures.com/service/app/1vu33ki6emqe3/user/anon-5268552066-776457/features?anonymous=true
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      accept:
+      - application/json
+      user-agent:
+      - Ruby
+      authorization:
+      - lnUG0NAuKXwRxzlO0Ogwh3JLRBr3Fq8SBxcNHUJo
+      accept-encoding:
+      - gzip
+      connection:
+      - keep-alive
+      keep-alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      cache-control:
+      - no-cache
+      content-type:
+      - text/html; charset=UTF-8
+      date:
+      - Wed, 05 Dec 2012 14:39:11 GMT
+      etag:
+      - ! '"e80009a3efad2781f2596adda05db2c0556fca4f"'
+      expires:
+      - Wed, 05 Dec 2012 14:39:10 GMT
+      server:
+      - TornadoServer/2.3
+      content-length:
+      - '73'
+      connection:
+      - keep-alive
+    body:
+      encoding: US-ASCII
+      string: ! '{"Feature": {"a": false, "b": true}, "Feature1": {"a": true, "b":
+        false}}'
+    http_version: '1.1'
+  recorded_at: Wed, 05 Dec 2012 14:39:10 GMT
+- request:
+    method: get
+    uri: https://www.fluidfeatures.com/service/app/1vu33ki6emqe3/user/anon-6457886880-798839/features?anonymous=true
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      accept:
+      - application/json
+      user-agent:
+      - Ruby
+      authorization:
+      - lnUG0NAuKXwRxzlO0Ogwh3JLRBr3Fq8SBxcNHUJo
+      accept-encoding:
+      - gzip
+      connection:
+      - keep-alive
+      keep-alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      cache-control:
+      - no-cache
+      content-type:
+      - text/html; charset=UTF-8
+      date:
+      - Wed, 05 Dec 2012 14:43:22 GMT
+      etag:
+      - ! '"e7a75db4fe4f42aebb7d788303e8e7265e601196"'
+      expires:
+      - Wed, 05 Dec 2012 14:43:21 GMT
+      server:
+      - TornadoServer/2.3
+      content-length:
+      - '73'
+      connection:
+      - keep-alive
+    body:
+      encoding: US-ASCII
+      string: ! '{"Feature": {"a": false, "b": true}, "Feature1": {"a": false, "b":
+        true}}'
+    http_version: '1.1'
+  recorded_at: Wed, 05 Dec 2012 14:43:21 GMT
+- request:
+    method: get
+    uri: https://www.fluidfeatures.com/service/app/1vu33ki6emqe3/user/anon-908374837-796428/features?anonymous=true
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      accept:
+      - application/json
+      user-agent:
+      - Ruby
+      authorization:
+      - lnUG0NAuKXwRxzlO0Ogwh3JLRBr3Fq8SBxcNHUJo
+      accept-encoding:
+      - gzip
+      connection:
+      - keep-alive
+      keep-alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      cache-control:
+      - no-cache
+      content-type:
+      - text/html; charset=UTF-8
+      date:
+      - Wed, 05 Dec 2012 14:43:32 GMT
+      etag:
+      - ! '"e80009a3efad2781f2596adda05db2c0556fca4f"'
+      expires:
+      - Wed, 05 Dec 2012 14:43:31 GMT
+      server:
+      - TornadoServer/2.3
+      content-length:
+      - '73'
+      connection:
+      - keep-alive
+    body:
+      encoding: US-ASCII
+      string: ! '{"Feature": {"a": false, "b": true}, "Feature1": {"a": true, "b":
+        false}}'
+    http_version: '1.1'
+  recorded_at: Wed, 05 Dec 2012 14:43:31 GMT
+- request:
+    method: get
+    uri: https://www.fluidfeatures.com/service/app/1vu33ki6emqe3/user/anon-8963566770-407532/features?anonymous=true
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      accept:
+      - application/json
+      user-agent:
+      - Ruby
+      authorization:
+      - lnUG0NAuKXwRxzlO0Ogwh3JLRBr3Fq8SBxcNHUJo
+      accept-encoding:
+      - gzip
+      connection:
+      - keep-alive
+      keep-alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      cache-control:
+      - no-cache
+      content-type:
+      - text/html; charset=UTF-8
+      date:
+      - Wed, 05 Dec 2012 14:44:20 GMT
+      etag:
+      - ! '"e7a75db4fe4f42aebb7d788303e8e7265e601196"'
+      expires:
+      - Wed, 05 Dec 2012 14:44:19 GMT
+      server:
+      - TornadoServer/2.3
+      content-length:
+      - '73'
+      connection:
+      - keep-alive
+    body:
+      encoding: US-ASCII
+      string: ! '{"Feature": {"a": false, "b": true}, "Feature1": {"a": false, "b":
+        true}}'
+    http_version: '1.1'
+  recorded_at: Wed, 05 Dec 2012 14:44:19 GMT
+recorded_with: VCR 2.3.0

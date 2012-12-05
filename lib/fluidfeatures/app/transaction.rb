@@ -12,7 +12,7 @@ module FluidFeatures
       @url  = url
 
       # take a snap-shot of the features end at
-      # the beginning of the transaction
+      # the beginning of the transactionapplication
       @features = user.features
 
       @features_hit = {}
@@ -99,11 +99,10 @@ module FluidFeatures
     # so that FluidFeatures can auto-populate the dashboard.
     #
     def end_transaction
-
-      raise "transaction already ended" if ended
-      @ended = true
-      @duration = Time.now - start_time
+      raise "transaction ended" if ended
+      @duration = duration #Time.now - start_time
       user.app.reporter.report_transaction(self)
+      @ended = true
     end
 
   end
