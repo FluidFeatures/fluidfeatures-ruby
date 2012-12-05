@@ -1,0 +1,7 @@
+language: ruby
+rvm:
+  - 1.9.3
+gemfile:
+  - Gemfile
+script: bundle exec rake spec
+env: FLUIDFEATURES_APPID=1vu33ki6emqe3 FLUIDFEATURES_SECRET=secret FLUIDFEATURES_BASEURI=https://www.fluidfeatures.com/service
