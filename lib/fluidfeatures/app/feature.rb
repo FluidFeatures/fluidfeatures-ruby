@@ -15,7 +15,7 @@ module FluidFeatures
       version_name ||= ::FluidFeatures::DEFAULT_VERSION_NAME
       raise "version_name invalid : #{version_name}" unless version_name.is_a? String
 
-      @app = client
+      @app = app
       @feature_name = feature_name
       @version_name = version_name
 
@@ -34,7 +34,7 @@ module FluidFeatures
 
       app.put("/feature/#{feature_name}/#{version_name}/enabled/percent", {
         :enabled => {
-          :percent => enabled_percent
+          :percent => percent
         }
       })
     end

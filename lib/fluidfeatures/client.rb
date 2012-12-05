@@ -4,6 +4,7 @@ require "persistent_http"
 require "pre_ruby192/uri" if RUBY_VERSION < "1.9.2"
 require "thread"
 require "uuid"
+require "json"
 
 require "fluidfeatures/app"
 
@@ -149,14 +150,14 @@ module FluidFeatures
       success = false
       begin
 
-        request = Net::HTTP::Put.new uri_path
+        request = Net::HTTP::Put.new url_path
         request["Authorization"] = auth_token
         request["Accept"] = "application/json"
         request["Accept-Encoding"] = "gzip"
         encode_request_body(request, payload)
 
         request_start_time = Time.now
-        response = @http.request uri, request
+        response = @http.request request
         duration = Time.now - request_start_time
 
         raise "expected Net::HTTPResponse" if not response.is_a? Net::HTTPResponse

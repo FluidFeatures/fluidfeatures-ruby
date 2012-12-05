@@ -1,4 +1,3 @@
-
 require "fluidfeatures/const"
 require "thread"
 
@@ -27,9 +26,12 @@ module FluidFeatures
     WAIT_BETWEEN_SEND_FAILURES = 5 # seconds
     
     def initialize(app)
-
       raise "app invalid : #{app}" unless app.is_a? ::FluidFeatures::App
+      configure(app)
+      run_loop
+    end
 
+    def configure(app)
       @app = app
 
       @buckets = []
@@ -41,9 +43,6 @@ module FluidFeatures
 
       @unknown_features = {}
       @unknown_features_lock = ::Mutex.new
-
-      run_transcation_sender
-
     end
 
     # Pass FluidFeatures::AppTransaction for reporting back to the
@@ -81,7 +80,7 @@ module FluidFeatures
 
     end
 
-    def run_transcation_sender
+    def run_loop
       Thread.new do
         while true
           begin
@@ -91,7 +90,7 @@ module FluidFeatures
               next
             end
 
-            success = send_transcations
+            success = send_transactions
 
             if success
               # Unless we have a full bucket waiting do not make
@@ -109,7 +108,7 @@ module FluidFeatures
 
           rescue Exception => err
             # catch errors, so that we do not affect the rest of the application
-            app.logger.error "[FF] send_transcations failed : #{err.message}\n#{err.backtrace.join("\n")}"
+            app.logger.error "[FF] send_transactions failed : #{err.message}\n#{err.backtrace.join("\n")}"
             # hold off for a little while and try again
             sleep WAIT_BETWEEN_SEND_FAILURES
           end
@@ -135,9 +134,9 @@ module FluidFeatures
     end
 
     @private
-    def send_transcations
+    def send_transactions
       bucket = remove_bucket
-      
+
       # Take existing unknown features and reset
       unknown_features = nil
       @unknown_features_lock.synchronize do
@@ -173,7 +172,7 @@ module FluidFeatures
       unless success
         # return bucket into bucket queue until the next attempt at sending
         if not unremove_bucket(bucket)
-          app.logger.warn "[FF] Discarded #{discarded_bucket.size} transactions due to reporter backlog. These will not be reported to FluidFeatures."
+          app.logger.warn "[FF] Discarded transactions due to reporter backlog. These will not be reported to FluidFeatures."
         end
         # return unknown features to queue until the next attempt at sending
         queue_unknown_features(unknown_features)
@@ -251,7 +250,7 @@ module FluidFeatures
     def queue_unknown_features(unknown_features)
       raise "unknown_features should be a Hash" unless unknown_features.is_a? Hash
       unknown_features.each_pair do |feature_name, versions|
-        raise "unknown_features values should be Hash. versions=#{versions}" unless versions.is_a? Hash
+        raise "unknown_features values should be a Hash. versions=#{versions}" unless versions.is_a? Hash
       end
       @unknown_features_lock.synchronize do
         unknown_features.each_pair do |feature_name, versions|
