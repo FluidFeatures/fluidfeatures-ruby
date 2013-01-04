@@ -20,12 +20,16 @@ This gem can be used in any Ruby application. This means a Sinatra application, 
 Installation
 ------------
 
-`gem install fluidfeatures-ruby`
+```
+gem install fluidfeatures-ruby
+```
 
 "Application"
 -------------
 
-At the top-level you create a FluidFeatures App (application) object with the credentials for accessing the FluidFeatures API.
+You create a FluidFeatures::App (application) object with the credentials for accessing the FluidFeatures API. These credentials can be found of the application page of your FluidFeatures dashboard.
+
+Call `app` on the `FluidFeatures` module to instantiate this object.
 
 ```ruby
 require 'fluidfeatures'
@@ -37,7 +41,7 @@ secret = "sssseeecrrreeetttt"
 fluid_app = FluidFeatures.app(base_uri, app_id, secret)
 ```
 
-It's also possible to pass a logger object
+It's also possible to pass a logger object, which will direct all logging to your logger.
 
 ```ruby
 fluid_app = FluidFeatures.app(base_uri, app_id, secret, logger)
