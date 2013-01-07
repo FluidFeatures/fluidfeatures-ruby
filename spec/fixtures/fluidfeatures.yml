@@ -1,0 +1,18 @@
+common:
+  baseuri: baseuri
+  cache:
+    enable: false
+    dir: cache_dir
+    limit: 2mb
+
+development:
+  appid: development_appid
+  secret: development_secret
+
+test:
+  appid: test_appid
+  secret: test_secret
+
+production:
+  appid: production_appid
+  secret: production_secret

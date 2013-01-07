@@ -12,7 +12,7 @@ module FluidFeatures
       @url  = url
 
       # take a snap-shot of the features end at
-      # the beginning of the transactionapplication
+      # the beginning of the transaction
       @features = user.features
 
       @features_hit = {}

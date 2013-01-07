@@ -35,8 +35,12 @@ module FluidFeatures
 
     def configure(app)
       @app = app
-      @features = {}
+      @features = features_storage.list
       @features_lock = ::Mutex.new
+    end
+
+    def features_storage
+      @features_storage ||= FluidFeatures::Persistence::Features.create(FluidFeatures.config["cache"])
     end
 
     def features
@@ -50,6 +54,7 @@ module FluidFeatures
     def features= f
       return unless f.is_a? Hash
       @features_lock.synchronize do
+        features_storage.replace(f) unless @features == f
         @features = f
       end
     end
