@@ -1,15 +1,24 @@
-
 require "logger"
+
+require "fluidfeatures/config"
+
+require "fluidfeatures/persistence/storage"
+require "fluidfeatures/persistence/buckets"
+require "fluidfeatures/persistence/features"
 
 require "fluidfeatures/client"
 require "fluidfeatures/app"
 
 module FluidFeatures
   
-  def self.app(base_uri, app_id, secret, logger=nil)
-    logger ||= ::Logger.new(STDERR)
-    client = ::FluidFeatures::Client.new(base_uri, logger)
-    ::FluidFeatures::App.new(client, app_id, secret, logger)
+  class << self
+    attr_accessor :config
   end
 
+  def self.app(config)
+    config["logger"] ||= ::Logger.new(STDERR)
+    self.config = config
+    client = ::FluidFeatures::Client.new(config["baseuri"], config["logger"])
+    ::FluidFeatures::App.new(client, config["appid"], config["secret"], config["logger"])
+  end
 end

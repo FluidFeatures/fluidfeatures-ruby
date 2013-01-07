@@ -1,11 +1,17 @@
 module FluidFeatures
   module ApiHelpers
-    def api_credentials
-      [ ENV["FLUIDFEATURES_BASEURI"], ENV["FLUIDFEATURES_APPID"], ENV["FLUIDFEATURES_SECRET"] ]
+    def config
+      {
+        "cache" => { "enable" => true, "dir" => "spec/tmp", "limit" => 1024 ** 2 },
+        "baseuri" => ENV["FLUIDFEATURES_BASEURI"],
+        "appid" => ENV["FLUIDFEATURES_APPID"],
+        "secret" => ENV["FLUIDFEATURES_SECRET"],
+        "logger" => Logger.new("/dev/null")
+      }
     end
 
     def app
-      @app ||= FluidFeatures.app(*api_credentials.push( Logger.new("/dev/null") ))
+      @app ||= FluidFeatures.app(config)
     end
 
     def transaction
@@ -16,7 +22,6 @@ module FluidFeatures
     def commit(transaction)
       transaction.end_transaction
       @transaction = transaction = nil
-      #Thread.list.map &:join
     end
 
     #time to sleep waiting for thread

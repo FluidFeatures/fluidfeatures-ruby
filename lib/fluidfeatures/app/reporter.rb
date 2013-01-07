@@ -6,7 +6,7 @@ module FluidFeatures
     
     attr_accessor :app
     
-    # Throw away oldest buckets when this limit reached.
+    # Throw oldest buckets away or offload to persistent storage when this limit reached.
     MAX_BUCKETS = 10
 
     # Max number of transactions we queue in a bucket.
@@ -29,20 +29,37 @@ module FluidFeatures
       raise "app invalid : #{app}" unless app.is_a? ::FluidFeatures::App
       configure(app)
       run_loop
+      at_exit do
+        buckets_storage.append(@buckets)
+      end
+    end
+
+    def buckets_storage
+      @buckets_storage ||= FluidFeatures::Persistence::Buckets.create(FluidFeatures.config["cache"])
+    end
+
+    def features_storage
+      @features_storage ||= FluidFeatures::Persistence::Features.create(FluidFeatures.config["cache"])
     end
 
     def configure(app)
       @app = app
 
-      @buckets = []
+      @buckets = buckets_storage.fetch(MAX_BUCKETS)
+
       @buckets_lock = ::Mutex.new
 
+      #maybe could get rid of @current_bucket concept
       @current_bucket = nil
       @current_bucket_lock = ::Mutex.new
-      @current_bucket = new_bucket
+      @current_bucket = last_or_new_bucket
 
-      @unknown_features = {}
+      @unknown_features = features_storage.list_unknown
       @unknown_features_lock = ::Mutex.new
+    end
+
+    def last_or_new_bucket
+      @buckets.empty? || @buckets.last.size >= MAX_BUCKET_SIZE ? new_bucket : @buckets.last
     end
 
     # Pass FluidFeatures::AppTransaction for reporting back to the
@@ -76,6 +93,7 @@ module FluidFeatures
 
       if transaction.unknown_features.size > 0
         queue_unknown_features(transaction.unknown_features)
+        features_storage.replace_unknown(@unknown_features)
       end
 
     end
@@ -176,6 +194,8 @@ module FluidFeatures
         end
         # return unknown features to queue until the next attempt at sending
         queue_unknown_features(unknown_features)
+      else
+        features_storage.replace_unknown({})
       end
 
       # return whether we were able to send or not
@@ -194,15 +214,14 @@ module FluidFeatures
     @private
     def new_bucket
       bucket = []
-      discarded_bucket = nil
       @buckets_lock.synchronize do
         @buckets << bucket
         if @buckets.size > MAX_BUCKETS
-          discarded_bucket = @buckets.shift
+          #offload to storage
+          unless buckets_storage.append_one(@buckets.shift)
+            app.logger.warn "[FF] Discarded transactions due to reporter backlog. These will not be reported to FluidFeatures."
+          end
         end
-      end
-      if discarded_bucket
-        app.logger.warn "[FF] Discarded #{discarded_bucket.size} transactions due to reporter backlog. These will not be reported to FluidFeatures."
       end
       bucket
     end
@@ -211,6 +230,11 @@ module FluidFeatures
     def remove_bucket
       removed_bucket = nil
       @buckets_lock.synchronize do
+        #try to get buckets from storage first
+        if @buckets.empty? && !buckets_storage.empty?
+          @buckets = buckets_storage.fetch(MAX_BUCKETS)
+        end
+
         if @buckets.size > 0
           removed_bucket = @buckets.shift
         end
@@ -231,6 +255,8 @@ module FluidFeatures
         if @buckets.size <= MAX_BUCKETS
           @buckets.unshift bucket
           success = true
+        else
+          success = buckets_storage.append_one(bucket)
         end
       end
       success

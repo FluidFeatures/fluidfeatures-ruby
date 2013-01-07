@@ -1,14 +1,13 @@
 shared_examples "polling loop" do |payload_method|
-
   let(:app) { mock "FluidFeatures::App" }
 
   before(:each) do
     app.stub!(:is_a?).and_return(false)
     app.stub!(:is_a?).with(FluidFeatures::App).and_return(true)
+    FluidFeatures.stub(:config).and_return(config)
   end
 
   context "initialization" do
-
     before(:each) do
       described_class.any_instance.stub(:configure)
       described_class.any_instance.stub(:run_loop)
@@ -38,5 +37,4 @@ shared_examples "polling loop" do |payload_method|
   it "should initialize @app" do
     described_class.new(app).app.should == app
   end
-
 end
