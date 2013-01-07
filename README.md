@@ -34,17 +34,19 @@ Call `app` on the `FluidFeatures` module to instantiate this object.
 ```ruby
 require 'fluidfeatures'
 
-base_uri = "https://www.fluidfeatures.com/service"
-app_id = "1vu33ki6emqe3"
-secret = "sssseeecrrreeetttt"
+config = {
+  "baseuri" => "https://www.fluidfeatures.com/service"
+  "appid" => "1vu33ki6emqe3"
+  "secret" = "sssseeecrrreeetttt"
+}
 
-fluid_app = FluidFeatures.app(base_uri, app_id, secret)
+fluid_app = FluidFeatures.app(config)
 ```
 
 It's also possible to pass a logger object, which will direct all logging to your logger.
 
 ```ruby
-fluid_app = FluidFeatures.app(base_uri, app_id, secret, logger)
+fluid_app = FluidFeatures.app(config.update("logger" => logger))
 ```
 
 User Transactions
