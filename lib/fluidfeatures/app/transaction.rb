@@ -12,7 +12,7 @@ module FluidFeatures
       @url  = url
 
       # take a snap-shot of the features end at
-      # the beginning of the transactionapplication
+      # the beginning of the transaction
       @features = user.features
 
       @features_hit = {}
@@ -23,7 +23,7 @@ module FluidFeatures
 
     end
 
-    def feature_enabled?(feature_name, version_name, default_enabled)
+    def feature_enabled?(feature_name, version_name=nil, default_enabled=nil)
       raise "transaction ended" if ended
       raise "feature_name invalid : #{feature_name}" unless feature_name.is_a? String
       version_name ||= ::FluidFeatures::DEFAULT_VERSION_NAME
@@ -73,7 +73,7 @@ module FluidFeatures
       end
     end
 
-    def goal_hit(goal_name, goal_version_name)
+    def goal_hit(goal_name, goal_version_name=nil)
       raise "transaction ended" if ended
       raise "goal_name invalid : #{goal_name}" unless goal_name.is_a? String
       goal_version_name ||= ::FluidFeatures::DEFAULT_VERSION_NAME

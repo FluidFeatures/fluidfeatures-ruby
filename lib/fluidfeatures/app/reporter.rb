@@ -62,8 +62,8 @@ module FluidFeatures
       @buckets.empty? || @buckets.last.size >= MAX_BUCKET_SIZE ? new_bucket : @buckets.last
     end
 
-    # Pass FluidFeatures::AppTransaction for reporting back to the
-    # FluidFeatures service.
+    # Pass FluidFeatures::AppUserTransaction for reporting
+    # back to the FluidFeatures service.
     def report_transaction(transaction)
 
       user = transaction.user
