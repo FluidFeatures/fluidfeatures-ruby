@@ -1,3 +1,7 @@
+
+require 'yaml'
+require 'erb'
+
 module FluidFeatures
   class Config
     attr_accessor :vars
