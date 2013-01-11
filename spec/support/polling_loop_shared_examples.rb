@@ -1,4 +1,4 @@
-shared_examples "polling loop" do |payload_method|
+shared_examples "polling loop" do
   let(:app) { mock "FluidFeatures::App" }
 
   before(:each) do
@@ -22,16 +22,10 @@ shared_examples "polling loop" do |payload_method|
       described_class.new(app)
     end
 
-    it "should call #run_loop" do
-      described_class.any_instance.should_receive(:run_loop)
+    it "should not call #run_loop" do
+      described_class.any_instance.should_not_receive(:run_loop)
       described_class.new(app)
     end
-  end
-
-  it "#run_loop should call payload method" do
-    described_class.any_instance.should_receive(payload_method)
-    described_class.new(app)
-    sleep 0.15
   end
 
   it "should initialize @app" do

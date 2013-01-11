@@ -4,7 +4,7 @@ require "fluidfeatures/persistence/features"
 
 describe FluidFeatures::AppState do
 
-  it_should_behave_like "polling loop", :load_state
+  it_should_behave_like "polling loop"
 
   context do
     let(:state) { described_class.new(app) }
@@ -16,8 +16,12 @@ describe FluidFeatures::AppState do
     before(:each) do
       app.stub!(:is_a?).and_return(false)
       app.stub!(:is_a?).with(FluidFeatures::App).and_return(true)
-      described_class.any_instance.stub(:run_loop)
       FluidFeatures.stub(:config).and_return(config)
+    end
+
+    after(:each) do
+      # ensure the loop is shutdown
+      state.stop_receiving(wait=true)
     end
 
     describe "#features_storage" do
@@ -48,19 +52,26 @@ describe FluidFeatures::AppState do
         features = mock("features")
         features_storage.should_receive(:list).and_return(features)
         state.configure(app)
-        state.instance_variable_get(:@features).should == features
+        state.should_receive(:run_loop)
+        state.should_receive(:load_state).with(false).and_return([false,nil])
+        state.features.should == features
       end
     end
 
     describe "#features=" do
-      it "should replace features if there are changes" do
+      it "should replace features" do
         state.features_storage.should_receive(:replace).with({foo: "bar"})
         state.features = {foo: "bar"}
       end
+    end
 
-      it "should not replace features if not amended" do
-        state.features_storage.should_not_receive(:replace)
-        state.features = {}
+    describe "#start_receiving" do
+      it "#start_receiving should call load_state" do
+        # load_state needs to return success=true to prevent throttling
+        state.should_receive(:load_state).and_return([true,{}])
+        state.start_receiving
+        sleep(0.001) # wait for thread to start
+        state.stop_receiving(wait=true)
       end
     end
 

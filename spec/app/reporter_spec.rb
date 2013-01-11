@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe FluidFeatures::AppReporter do
 
-  it_should_behave_like "polling loop", :send_transactions do
+  it_should_behave_like "polling loop" do
     before(:each) { described_class.any_instance.stub(:transactions_queued?).and_return(true) }
   end
 
@@ -15,15 +15,15 @@ describe FluidFeatures::AppReporter do
     let(:transaction) { mock('transaction', url: 'http://example.com/source.html', duration: 999, user: user, unknown_features: [], features_hit: %w[feature], goals_hit: %w[goal]) }
 
     before(:each) do
-      described_class.any_instance.stub(:run_loop)
       FluidFeatures.stub(:config).and_return(config)
     end
 
     describe "#features_storage" do
       before(:each) do
         described_class.any_instance.stub(:configure)
-        FluidFeatures::Persistence::Features.should_receive(:create).with(config["cache"]).twice
-        .and_return(FluidFeatures::Persistence::NullFeatures.new)
+        FluidFeatures::Persistence::Features
+          .should_receive(:create).with(config["cache"])
+          .and_return(FluidFeatures::Persistence::NullFeatures.new)
       end
 
       it "should create features storage" do
@@ -181,6 +181,17 @@ describe FluidFeatures::AppReporter do
 
       it "should raise error if versions is not Hash" do
         expect { reporter.queue_unknown_features("feature" => "not cool") }.to raise_error /should be a Hash/
+      end
+    end
+
+    describe "#start_sending" do
+      it "#start_sending should call send_transactions" do
+        reporter.should_receive(:transactions_queued?).and_return(true)
+        # send_transactions needs to return success=true to prevent throttling
+        reporter.should_receive(:send_transactions).and_return(true)
+        reporter.start_sending
+        sleep(0.001) # wait for thread to start
+        reporter.stop_sending(wait=true)
       end
     end
 
