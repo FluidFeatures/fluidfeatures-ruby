@@ -144,7 +144,7 @@ module FluidFeatures
     @private
     def transactions_queued?
       have_transactions = false
-      @buckets_lock.synchronize do
+      buckets_lock_synchronize do
         if @buckets.size == 1
           @current_bucket_lock.synchronize do
             if @current_bucket.size > 0
@@ -170,7 +170,7 @@ module FluidFeatures
       end
 
       remaining_buckets_stats = nil
-      @buckets_lock.synchronize do
+      buckets_lock_synchronize do
         remaining_buckets_stats = @buckets.map { |b| b.size }
       end
 
@@ -212,7 +212,7 @@ module FluidFeatures
     @private
     def bucket_count
       num_buckets = 0
-      @buckets_lock.synchronize do
+      buckets_lock_synchronize do
         num_buckets = @buckets.size
       end
       num_buckets
@@ -221,7 +221,7 @@ module FluidFeatures
     @private
     def new_bucket
       bucket = []
-      @buckets_lock.synchronize do
+      buckets_lock_synchronize do
         @buckets << bucket
         if @buckets.size > MAX_BUCKETS
           #offload to storage
@@ -236,7 +236,7 @@ module FluidFeatures
     @private
     def remove_bucket
       removed_bucket = nil
-      @buckets_lock.synchronize do
+      buckets_lock_synchronize do
         #try to get buckets from storage first
         if @buckets.empty? && !buckets_storage.empty?
           @buckets = buckets_storage.fetch(MAX_BUCKETS)
@@ -258,7 +258,7 @@ module FluidFeatures
     @private
     def unremove_bucket(bucket)
       success = false
-      @buckets_lock.synchronize do
+      buckets_lock_synchronize do
         if @buckets.size <= MAX_BUCKETS
           @buckets.unshift bucket
           success = true
@@ -296,6 +296,13 @@ module FluidFeatures
             end
           end
         end
+      end
+    end
+
+    @private
+    def buckets_lock_synchronize
+      @buckets_lock.synchronize do
+        yield
       end
     end
 

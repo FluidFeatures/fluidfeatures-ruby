@@ -50,12 +50,6 @@ module FluidFeatures
       @features_storage ||= FluidFeatures::Persistence::Features.create(FluidFeatures.config["cache"])
     end
 
-    def features_lock_synchronize
-      @features_lock.synchronize do
-        yield
-      end
-    end
-
     def features
       f = nil
       if @started_receiving
@@ -191,6 +185,13 @@ module FluidFeatures
       end
 
       enabled
+    end
+
+    @private
+    def features_lock_synchronize
+      @features_lock.synchronize do
+        yield
+      end
     end
 
   end
