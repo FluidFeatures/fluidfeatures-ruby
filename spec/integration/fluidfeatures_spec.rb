@@ -5,7 +5,7 @@ describe "FluidFeatures" do
   describe "App initialization" do
     it "should raise 'host not set' without valid base uri" do
       expect { FluidFeatures.app(config.remove("base_uri")) }.
-        to raise_error(StandardError, /host not set/)
+        to raise_error(FFeaturesBadParam, /base_uri/)
     end
 
     it "should raise 'app_id invalid' without valid app id" do
