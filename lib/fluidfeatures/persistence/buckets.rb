@@ -3,14 +3,14 @@ module FluidFeatures
     class Buckets < Storage
       attr_accessor :limit
 
-      def self.create(config)
+      def self.create(config, logger=nil)
         return NullBuckets.new unless config && config["dir"] && config["enable"] && config["limit"] > 0
-        new(config)
+        new(config, logger)
       end
 
-      def initialize(config)
+      def initialize(config, logger=nil)
         self.limit = config["limit"]
-        super config
+        super
       end
 
       def fetch(n = 1)
