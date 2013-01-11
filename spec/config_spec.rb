@@ -29,21 +29,21 @@ describe FluidFeatures::Config do
 
       it "should load environment configuration from yml file and merge common section" do
         config.vars.should == {
-            "baseuri" => "baseuri",
+            "base_uri" => "base_uri",
             "cache" => { "enable" => false, "dir" => "cache_dir", "limit" => 2097152 },
-            "appid" => "#{env_name}_appid",
+            "app_id" => "#{env_name}_app_id",
             "secret" => "#{env_name}_secret"
         }
       end
 
       context "and replacements" do
-        let(:replacements) { { "baseuri" => "env_baseuri", "appid" => "env_appid", "secret" => "env_secret" } }
+        let(:replacements) { { "base_uri" => "env_base_uri", "app_id" => "env_app_id", "secret" => "env_secret" } }
 
         it "should update variables with passed hash" do
           config.vars.should == {
-              "baseuri" => "env_baseuri",
+              "base_uri" => "env_base_uri",
               "cache" => { "enable" => false, "dir" => "cache_dir", "limit" => 2097152 },
-              "appid" => "env_appid",
+              "app_id" => "env_app_id",
               "secret" => "env_secret"
           }
         end

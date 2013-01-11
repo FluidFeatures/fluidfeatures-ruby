@@ -3,8 +3,8 @@ module FluidFeatures
     def config
       {
         "cache" => { "enable" => true, "dir" => "spec/tmp", "limit" => 1024 ** 2 },
-        "baseuri" => ENV["FLUIDFEATURES_BASEURI"],
-        "appid" => ENV["FLUIDFEATURES_APPID"],
+        "base_uri" => ENV["FLUIDFEATURES_BASEURI"],
+        "app_id" => ENV["FLUIDFEATURES_APPID"],
         "secret" => ENV["FLUIDFEATURES_SECRET"],
         "logger" => Logger.new("/dev/null")
       }
