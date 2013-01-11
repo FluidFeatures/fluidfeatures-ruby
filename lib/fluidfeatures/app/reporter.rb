@@ -40,8 +40,11 @@ module FluidFeatures
       run_loop
     end
 
-    def stop_sending
+    def stop_sending(wait=false)
       @sending = false
+      if wait
+        @loop_thread.join if @loop_thread and @loop_thread.alive?
+      end
     end
 
     def buckets_storage
@@ -110,7 +113,11 @@ module FluidFeatures
     end
 
     def run_loop
-      Thread.new do
+
+      return unless @sending
+      return if @loop_thread and @loop_thread.alive?
+
+      @loop_thread = Thread.new do
         while @sending
           begin
 

@@ -46,8 +46,11 @@ module FluidFeatures
       run_loop
     end
 
-    def stop_receiving
+    def stop_receiving(wait=false)
       @receiving = false
+      if wait
+        @loop_thread.join if @loop_thread and @loop_thread.alive?
+      end
     end
 
     def features_storage
@@ -101,7 +104,11 @@ module FluidFeatures
     end
 
     def run_loop
-      Thread.new do
+
+      return unless @receiving
+      return if @loop_thread and @loop_thread.alive?
+
+      @loop_thread = Thread.new do
         while @receiving
           begin
 
