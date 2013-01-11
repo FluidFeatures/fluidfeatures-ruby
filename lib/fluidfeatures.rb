@@ -15,10 +15,10 @@ module FluidFeatures
     attr_accessor :config
   end
 
-  def self.app(config)
-    config["logger"] ||= ::Logger.new(STDERR)
+  def self.app(config, logger=nil)
+    logger ||= ::Logger.new(STDERR)
     self.config = config
-    client = ::FluidFeatures::Client.new(config["baseuri"], config["logger"])
-    ::FluidFeatures::App.new(client, config["appid"], config["secret"], config["logger"])
+    client = ::FluidFeatures::Client.new(config["base_uri"], logger)
+    ::FluidFeatures::App.new(client, config["app_id"], config["secret"], logger)
   end
 end
