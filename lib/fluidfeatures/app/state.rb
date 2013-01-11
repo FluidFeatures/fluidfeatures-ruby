@@ -95,7 +95,7 @@ module FluidFeatures
     def features= f
       return unless f.is_a? Hash
       features_lock_synchronize do
-        features_storage.replace(f) unless @features == f
+        features_storage.replace(f)
         @features = f
       end
     end
