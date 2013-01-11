@@ -17,7 +17,9 @@ module FluidFeatures
           "Invalid 'source' given. Expected file path String or Hash. Got #{source.class}"
         )
       end
-      @vars["cache"]["limit"] = self.class.parse_file_size(vars["cache"]["limit"]) if @vars["cache"]
+      if @vars["cache"] and @vars["cache"]["limit"]
+        @vars["cache"]["limit"] = self.class.parse_file_size(vars["cache"]["limit"])
+      end
     end
 
     def [](name)
@@ -43,10 +45,9 @@ module FluidFeatures
     end
 
     def self.parse_file_size(size)
-      return nil unless size
       return size if size.is_a? Numeric
-      return size.to_i unless size.match /\D/
-      unless (/^(\d+)\s*(k|m|g)b$/i).match(size)
+      return size.to_i if size.is_a? String and size.match /^\d+$/
+      unless size.is_a? String and (/^(\d+)\s*(k|m|g)b$/i).match(size)
         raise FFeaturesConfigInvalid.new("Invalid file size string in config : '#{size}'")
       end
       $1.to_i * 1024 ** ("kmg".index($2.downcase) + 1)
