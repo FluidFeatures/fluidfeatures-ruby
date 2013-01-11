@@ -50,11 +50,17 @@ module FluidFeatures
       @features_storage ||= FluidFeatures::Persistence::Features.create(FluidFeatures.config["cache"])
     end
 
+    def features_lock_synchronize
+      @features_lock.synchronize do
+        yield
+      end
+    end
+
     def features
       f = nil
       if @started_receiving
         # use features loaded in background
-        @features_lock.synchronize do
+        features_lock_synchronize do
           f = @features
         end
       else
@@ -75,7 +81,7 @@ module FluidFeatures
         else
           # fluidfeatures API must be down.
           # load persisted features from disk.
-          @features_lock.synchronize do
+          features_lock_synchronize do
             f = @features = features_storage.list
           end
         end
@@ -90,7 +96,7 @@ module FluidFeatures
 
     def features= f
       return unless f.is_a? Hash
-      @features_lock.synchronize do
+      features_lock_synchronize do
         features_storage.replace(f) unless @features == f
         @features = f
       end
