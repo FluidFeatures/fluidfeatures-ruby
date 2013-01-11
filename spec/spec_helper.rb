@@ -1,9 +1,4 @@
 
-unless ENV["FLUIDFEATURES_APPID"]
-  $stderr.puts "Expect ENV variabled FLUIDFEATURES_APPID FLUIDFEATURES_SECRET FLUIDFEATURES_BASEURI to run the tests"
-  exit!
-end
-
 require 'vcr'
 require 'fluidfeatures'
 

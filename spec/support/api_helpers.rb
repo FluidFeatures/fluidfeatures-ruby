@@ -3,9 +3,9 @@ module FluidFeatures
     def config
       {
         "cache" => { "enable" => true, "dir" => "spec/tmp", "limit" => 1024 ** 2 },
-        "base_uri" => ENV["FLUIDFEATURES_BASEURI"],
-        "app_id" => ENV["FLUIDFEATURES_APPID"],
-        "secret" => ENV["FLUIDFEATURES_SECRET"],
+        "base_uri" => "https://www.fluidfeatures.com/service",
+        "app_id" => "1vu33ki6emqe3",
+        "secret" => "secret",
         "logger" => Logger.new("/dev/null")
       }
     end
