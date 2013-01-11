@@ -7,6 +7,7 @@ require "uuid"
 require "json"
 
 require "fluidfeatures/app"
+require 'fluidfeatures/exceptions'
 
 module FluidFeatures
   class Client
@@ -19,6 +20,9 @@ module FluidFeatures
     MIN_GZIP_SIZE = 1024
 
     def initialize(base_uri, logger)
+
+      raise FFeaturesBadParam.new("base_uri is not String, is #{base_uri.class}") \
+        unless base_uri.is_a? String
 
       @uuid = UUID.new.generate
       @logger = logger
