@@ -21,11 +21,8 @@ module FluidFeatures
       end
 
       def file_size
-        begin
-          File.size(path)
-        rescue Exception => _
-          return 0
-        end
+        # TODO: rescue should return nil here
+        File.size(path) rescue 0
       end
     end
   end
