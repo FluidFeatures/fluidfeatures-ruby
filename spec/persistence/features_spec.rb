@@ -26,7 +26,7 @@ describe FluidFeatures::Persistence::Features do
   context "null instance" do
     let(:storage) { described_class.create(nil) }
 
-    specify { storage.list.should == {} }
+    specify { storage.list.should == nil }
 
     specify { storage.list_unknown.should == {} }
 
