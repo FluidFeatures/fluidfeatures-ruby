@@ -1,18 +1,18 @@
 common:
-  baseuri: baseuri
+  base_uri: base_uri
   cache:
     enable: false
     dir: cache_dir
     limit: 2mb
 
 development:
-  appid: development_appid
+  app_id: development_app_id
   secret: development_secret
 
 test:
-  appid: test_appid
+  app_id: test_app_id
   secret: test_secret
 
 production:
-  appid: production_appid
+  app_id: production_app_id
   secret: production_secret
