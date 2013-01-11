@@ -30,7 +30,7 @@ module FluidFeatures
 
     def initialize(app)
       raise "app invalid : #{app}" unless app.is_a? ::FluidFeatures::App
-      @started_receiving = false
+      @receiving = false
       configure(app)
     end
 
@@ -41,9 +41,13 @@ module FluidFeatures
     end
 
     def start_receiving
-      return if @started_receiving
-      @started_receiving = true
+      return if @receiving
+      @receiving = true
       run_loop
+    end
+
+    def stop_receiving
+      @receiving = false
     end
 
     def features_storage
@@ -52,7 +56,7 @@ module FluidFeatures
 
     def features
       f = nil
-      if @started_receiving
+      if @receiving
         # use features loaded in background
         features_lock_synchronize do
           f = @features
@@ -98,7 +102,7 @@ module FluidFeatures
 
     def run_loop
       Thread.new do
-        while true
+        while @receiving
           begin
 
             success, state = load_state
