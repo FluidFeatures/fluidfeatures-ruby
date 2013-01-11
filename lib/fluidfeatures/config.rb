@@ -49,7 +49,7 @@ module FluidFeatures
       unless (/^(\d+)\s*(k|m|g)b$/i).match(size)
         raise FFeaturesConfigInvalid.new("Invalid file size string in config : '#{size}'")
       end
-      $1.to_i * 1024 ** ("kmg".index($2) + 1)
+      $1.to_i * 1024 ** ("kmg".index($2.downcase) + 1)
     end
 
   end
