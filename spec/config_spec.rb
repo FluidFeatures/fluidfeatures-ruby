@@ -5,9 +5,7 @@ describe FluidFeatures::Config do
 
   let(:env) { "development" }
 
-  let(:replacements) { {} }
-
-  let(:config) { FluidFeatures::Config.new(path, env, replacements) }
+  let(:config) { FluidFeatures::Config.new(path, env) }
 
   context "parse file size" do
     [nil, 1024, "foo"].each do |input|
