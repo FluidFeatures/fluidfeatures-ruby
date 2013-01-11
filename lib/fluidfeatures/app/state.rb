@@ -4,6 +4,7 @@ require "thread"
 
 require "fluidfeatures/const"
 require "fluidfeatures/app/transaction"
+require "fluidfeatures/exceptions"
 
 module FluidFeatures
   class AppState
@@ -29,14 +30,20 @@ module FluidFeatures
 
     def initialize(app)
       raise "app invalid : #{app}" unless app.is_a? ::FluidFeatures::App
+      @started_receiving = false
       configure(app)
-      run_loop
     end
 
     def configure(app)
       @app = app
-      @features = features_storage.list
+      @features = nil
       @features_lock = ::Mutex.new
+    end
+
+    def start_receiving
+      return if @started_receiving
+      @started_receiving = true
+      run_loop
     end
 
     def features_storage
@@ -45,8 +52,38 @@ module FluidFeatures
 
     def features
       f = nil
-      @features_lock.synchronize do
-        f = @features
+      if @started_receiving
+        # use features loaded in background
+        @features_lock.synchronize do
+          f = @features
+        end
+      else
+        # start background receiver loop
+        start_receiving
+      end
+      unless f
+        # we have not loaded features yet.
+        # load in foreground but do not use caching (etags)
+        success, state = load_state(use_cache=false)
+        if success
+          unless state
+            # Since we did not use etag caching, state should never
+            # be nil if success was true.
+            raise FFeaturesAppStateLoadFailure.new("Unexpected nil state returned from successful load_state(use_cache=false).")
+          end
+          f = state
+        else
+          # fluidfeatures API must be down.
+          # load persisted features from disk.
+          @features_lock.synchronize do
+            f = @features = features_storage.list
+          end
+        end
+      end
+      # we should never return nil
+      unless f
+        # If we still could not load state then croak
+        raise FFeaturesAppStateLoadFailure.new("Could not load features state from API: #{state}")
       end
       f
     end
@@ -91,8 +128,8 @@ module FluidFeatures
       end
     end
 
-    def load_state
-      success, state = app.get("/features", { :verbose => true, :etag_wait => ETAG_WAIT }, true)
+    def load_state(use_cache=true)
+      success, state = app.get("/features", { :verbose => true, :etag_wait => ETAG_WAIT }, use_cache)
       if success and state
         state.each_pair do |feature_name, feature|
           feature["versions"].each_pair do |version_name, version|
