@@ -27,11 +27,17 @@ module FluidFeatures
     
     def initialize(app)
       raise "app invalid : #{app}" unless app.is_a? ::FluidFeatures::App
+      @started_sending = false
       configure(app)
-      run_loop
       at_exit do
         buckets_storage.append(@buckets)
       end
+    end
+
+    def start_sending
+      return if @started_sending
+      @started_sending = true
+      run_loop
     end
 
     def buckets_storage
@@ -96,6 +102,7 @@ module FluidFeatures
         features_storage.replace_unknown(@unknown_features)
       end
 
+      start_sending unless @started_sending
     end
 
     def run_loop
