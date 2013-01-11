@@ -2,18 +2,17 @@ module FluidFeatures
   module Persistence
     class Features < Storage
 
-      def self.create(config)
-        return NullFeatures.new unless config && config["dir"] && config["enable"]
-        new(config)
-      end
-
-      def initialize(config)
-        super config
+      def self.create(config, logger=nil)
+        if config && config["dir"] && config["enable"]
+          new(config, logger)
+        else
+          NullFeatures.new
+        end
       end
 
       def list
         store.transaction(true) do
-          return {} unless store && store["features"]
+          return nil unless store && store["features"]
           store["features"]
         end
       end
@@ -25,6 +24,7 @@ module FluidFeatures
         end
       end
 
+      # TODO: remove. we do not care about persisting these
       def list_unknown
         store.transaction(true) do
           return {} unless store && store["unknown_features"]
@@ -53,7 +53,7 @@ module FluidFeatures
     end
 
     class NullFeatures
-      def list; {} end
+      def list; nil end
       def list_unknown; {} end
       def replace(*args); false end
       def replace_unknown(*args); false end
