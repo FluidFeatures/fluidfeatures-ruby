@@ -30,7 +30,9 @@ module FluidFeatures
       @sending = false
       configure(app)
       at_exit do
-        buckets_storage.append(@buckets)
+        if @buckets_storage and @buckets
+          @buckets_storage.append(@buckets)
+        end
       end
     end
 
