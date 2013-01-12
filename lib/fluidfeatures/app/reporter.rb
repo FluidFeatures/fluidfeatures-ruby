@@ -119,36 +119,49 @@ module FluidFeatures
 
       @loop_thread = Thread.new do
         while @sending
-          begin
-
-            unless transactions_queued?
-              sleep WAIT_BETWEEN_QUEUE_EMTPY_CHECKS
-              next
-            end
-
-            success = send_transactions
-
-            if success
-              # Unless we have a full bucket waiting do not make
-              # more than N requests per second.
-              if bucket_count <= 1
-                sleep WAIT_BETWEEN_SEND_SUCCESS_NONE_WAITING
-              else
-                sleep WAIT_BETWEEN_SEND_SUCCESS_NEXT_WAITING
-              end
-            else  
-              # If service is down, then slow our requests
-              # within this thread
-              sleep WAIT_BETWEEN_SEND_FAILURES
-            end
-
-          rescue Exception => err
-            # catch errors, so that we do not affect the rest of the application
-            app.logger.error "[FF] send_transactions failed : #{err.message}\n#{err.backtrace.join("\n")}"
-            # hold off for a little while and try again
-            sleep WAIT_BETWEEN_SEND_FAILURES
-          end
+          run_loop_iteration(
+            WAIT_BETWEEN_QUEUE_EMTPY_CHECKS,
+            WAIT_BETWEEN_SEND_SUCCESS_NONE_WAITING,
+            WAIT_BETWEEN_SEND_SUCCESS_NEXT_WAITING,
+            WAIT_BETWEEN_SEND_FAILURES
+          )
         end
+      end
+    end
+
+    def run_loop_iteration(
+      wait_between_queue_emtpy_checks,
+      wait_between_send_success_none_waiting,
+      wait_between_send_success_next_waiting,
+      wait_between_send_failures)
+      begin
+
+        unless transactions_queued?
+          sleep wait_between_queue_emtpy_checks
+          return
+        end
+
+        success = send_transactions
+
+        if success
+          # Unless we have a full bucket waiting do not make
+          # more than N requests per second.
+          if bucket_count <= 1
+            sleep wait_between_send_success_none_waiting
+          else
+            sleep wait_between_send_success_next_waiting
+          end
+        else  
+          # If service is down, then slow our requests
+          # within this thread
+          sleep wait_between_send_failures
+        end
+
+      rescue Exception => err
+        # catch errors, so that we do not affect the rest of the application
+        app.logger.error "[FF] send_transactions failed : #{err.message}\n#{err.backtrace.join("\n")}"
+        # hold off for a little while and try again
+        sleep wait_between_send_failures
       end
     end
 

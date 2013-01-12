@@ -64,9 +64,6 @@ module FluidFeatures
         features_lock_synchronize do
           f = @features
         end
-      else
-        # start background receiver loop
-        start_receiving
       end
       unless f
         # we have not loaded features yet.
@@ -78,19 +75,21 @@ module FluidFeatures
             # be nil if success was true.
             raise FFeaturesAppStateLoadFailure.new("Unexpected nil state returned from successful load_state(use_cache=false).")
           end
-          f = state
+          self.features = f = state
         else
           # fluidfeatures API must be down.
           # load persisted features from disk.
-          features_lock_synchronize do
-            f = @features = features_storage.list
-          end
+          self.features = f = features_storage.list
         end
       end
       # we should never return nil
       unless f
         # If we still could not load state then croak
         raise FFeaturesAppStateLoadFailure.new("Could not load features state from API: #{state}")
+      end
+      unless @receiving
+        # start background receiver loop
+        start_receiving
       end
       f
     end
@@ -101,6 +100,7 @@ module FluidFeatures
         features_storage.replace(f)
         @features = f
       end
+      f
     end
 
     def run_loop
@@ -110,32 +110,36 @@ module FluidFeatures
 
       @loop_thread = Thread.new do
         while @receiving
-          begin
-
-            success, state = load_state
-
-            # Note, success could be true, but state might be nil.
-            # This occurs with 304 (no change)
-            if success and state
-              # switch out current state with new one
-              self.features = state
-            elsif not success
-              # If service is down, then slow our requests
-              # within this thread
-              sleep WAIT_BETWEEN_FETCH_FAILURES
-            end
-
-            # What ever happens never make more than N requests
-            # per second
-            sleep WAIT_BETWEEN_FETCH_SUCCESS
-
-          rescue Exception => err
-            # catch errors, so that we do not affect the rest of the application
-            app.logger.error "load_state failed : #{err.message}\n#{err.backtrace.join("\n")}"
-            # hold off for a little while and try again
-            sleep WAIT_BETWEEN_FETCH_FAILURES
-          end
+          run_loop_iteration(WAIT_BETWEEN_FETCH_SUCCESS, WAIT_BETWEEN_FETCH_FAILURES)
         end
+      end
+    end
+
+    def run_loop_iteration(wait_between_fetch_success, wait_between_fetch_failures)
+      begin
+
+        success, state = load_state
+
+        # Note, success could be true, but state might be nil.
+        # This occurs with 304 (no change)
+        if success and state
+          # switch out current state with new one
+          self.features = state
+        elsif not success
+          # If service is down, then slow our requests
+          # within this thread
+          sleep wait_between_fetch_failures
+        end
+
+        # What ever happens never make more than N requests
+        # per second
+        sleep wait_between_fetch_success
+
+      rescue Exception => err
+        # catch errors, so that we do not affect the rest of the application
+        app.logger.error "load_state failed : #{err.message}\n#{err.backtrace.join("\n")}"
+        # hold off for a little while and try again
+        sleep wait_between_fetch_failures
       end
     end
 
@@ -157,8 +161,6 @@ module FluidFeatures
       version_name ||= ::FluidFeatures::DEFAULT_VERSION_NAME
       raise "version_name invalid : #{version_name}" unless version_name.is_a? String
 
-      #assert(isinstance(user_id, basestring))
-
       user_attributes ||= {}
       user_attributes["user"] = user_id.to_s
       if user_id.is_a? Integer
@@ -171,7 +173,10 @@ module FluidFeatures
       enabled = false
 
       feature = features[feature_name]
+      return false unless feature
       version = feature["versions"][version_name]
+      return false unless version
+
       modulus = user_id_hash % feature["num_parts"]
       enabled = version["parts"].include? modulus
 
