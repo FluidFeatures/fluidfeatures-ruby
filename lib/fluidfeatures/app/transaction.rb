@@ -11,7 +11,7 @@ module FluidFeatures
       @user = user
       @url  = url
 
-      # take a snap-shot of the features end at
+      # take a snap-shot of the features enabled state at
       # the beginning of the transaction
       @features = user.features
 
