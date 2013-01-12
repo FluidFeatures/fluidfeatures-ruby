@@ -1,4 +1,5 @@
 require "spec_helper"
+require "support/api_helpers.rb"
 
 describe "FluidFeatures" do
 
@@ -65,7 +66,6 @@ describe "FluidFeatures" do
         transaction.feature_enabled?(feature_name, "a", true)
         transaction.goal_hit("Goal", "a")
         commit transaction
-        sleep abit
       end
     end
 
