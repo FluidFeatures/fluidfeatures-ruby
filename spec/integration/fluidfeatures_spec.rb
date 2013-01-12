@@ -19,7 +19,8 @@ describe "FluidFeatures" do
     end
 
     it "should set @config class variable to passed config" do
-      FluidFeatures::Client.stub!(:new); FluidFeatures::App.stub!(:new)
+      FluidFeatures::Client.stub!(:new)
+      FluidFeatures::App.stub!(:new)
       config = mock("config", "[]" => nil, "[]=" => nil)
       FluidFeatures.app(config)
       FluidFeatures.config.should == config
@@ -32,12 +33,28 @@ describe "FluidFeatures" do
 
     let(:feature) { app.features.pop[feature_name] }
 
+    before(:each) do
+      app.state.should_receive(:run_loop).once do
+        # only iterate once and not in a thread
+        app.state.run_loop_iteration(0,0)
+      end
+      app.reporter.should_receive(:run_loop).once do
+        # only iterate once and not in a thread
+        app.reporter.run_loop_iteration(0,0,0,0)
+      end
+    end
+
+    after(:each) do
+      # ensure the loop is shutdown
+      app.state.stop_receiving(wait=true)
+      app.reporter.stop_sending(wait=true)
+    end
+
     specify "#feature_enabled? should create feature" do
       VCR.use_cassette('feature') do
         transaction.feature_enabled?(feature_name, "a", true)
         transaction.feature_enabled?(feature_name, "b", true)
         commit transaction
-        sleep abit
         feature["name"].should == feature_name
         feature["versions"].size.should == 2
       end
@@ -51,5 +68,6 @@ describe "FluidFeatures" do
         sleep abit
       end
     end
+
   end
 end
