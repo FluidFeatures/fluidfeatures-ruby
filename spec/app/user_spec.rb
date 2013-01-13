@@ -54,11 +54,13 @@ describe FluidFeatures::AppUser do
       user.features.should == { "Feature" => { "a" => true } }
     end
 
+=begin
     it "should get features from api if env variable set" do
       ENV["FLUIDFEATURES_USER_FEATURES_FROM_API"] = "true"
       app.should_receive(:get).with("/user/user_id/features", {:anonymous=>"false"})
       user.features
     end
+=end
 
   end
 
