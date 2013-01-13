@@ -177,7 +177,7 @@ module FluidFeatures
       version = feature["versions"][version_name]
       return false unless version
 
-      modulus = user_id_hash % feature["num_parts"]
+      modulus = ((user_id_hash - 1) % feature["num_parts"]) + 1
       enabled = version["parts"].include? modulus
 
       feature["versions"].each_pair do |other_version_name, other_version|
