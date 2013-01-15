@@ -1,9 +1,16 @@
+require "yaml"
+
 module FluidFeatures
   class Config
     attr_accessor :vars
     def initialize(path, environment, replacements = {})
-      self.vars = YAML.load(ERB.new(File.read(path)).result)
-      self.vars = vars["common"].update(vars[environment])
+      if File.exists?(path)
+        self.vars = YAML.load(File.read(path))
+        self.vars = vars["common"].update(vars[environment])
+      else
+        #TODO maybe write to log here
+        self.vars = {}
+      end
       self.vars = vars.update(replacements)
       self.vars["cache"]["limit"] = self.class.parse_file_size(vars["cache"]["limit"]) if vars["cache"]
     end

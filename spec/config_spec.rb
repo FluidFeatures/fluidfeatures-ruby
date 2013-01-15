@@ -36,6 +36,13 @@ describe FluidFeatures::Config do
         }
       end
 
+      context "and incorrect path" do
+        let(:path) { "#{File.dirname(__FILE__)}/fixtures/not_correct.yml" }
+        it "should return empty hash" do
+          config.vars.should == {}
+        end
+      end
+
       context "and replacements" do
         let(:replacements) { { "baseuri" => "env_baseuri", "appid" => "env_appid", "secret" => "env_secret" } }
 
